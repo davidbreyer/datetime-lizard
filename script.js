@@ -10,10 +10,14 @@ const copyButton = document.querySelector("#copyButton");
 const saveButton = document.querySelector("#saveButton");
 const clearButton = document.querySelector("#clearButton");
 const outputRows = document.querySelector("#outputRows");
+const sqlRows = document.querySelector("#sqlRows");
+const csharpRows = document.querySelector("#csharpRows");
 const status = document.querySelector("#status");
 const stats = document.querySelector("#stats");
 const inputMeta = document.querySelector("#inputMeta");
 const resultCount = document.querySelector("#resultCount");
+const sqlCount = document.querySelector("#sqlCount");
+const csharpCount = document.querySelector("#csharpCount");
 const releaseStamp = document.querySelector("#releaseStamp");
 const mathDirection = document.querySelector("#mathDirection");
 const daysInput = document.querySelector("#daysInput");
@@ -21,10 +25,12 @@ const hoursInput = document.querySelector("#hoursInput");
 const minutesInput = document.querySelector("#minutesInput");
 const applyMathButton = document.querySelector("#applyMathButton");
 
-const appRelease = "20260613-2116";
+const appRelease = "20260614-1003";
 const dotnetEpochTicks = 621355968000000000n;
 const ticksPerMillisecond = 10000n;
 let currentRows = [];
+let currentSqlRows = [];
+let currentCsharpRows = [];
 let currentDate = new Date();
 
 sourceInput.value = new Date().toISOString();
@@ -83,12 +89,20 @@ function convertInput() {
     const parsed = parseInput(sourceInput.value, sourceFormat.value);
     currentDate = parsed.date;
     currentRows = buildRows(currentDate, parsed.source);
+    currentSqlRows = buildSqlRows(currentDate);
+    currentCsharpRows = buildCsharpRows(currentDate);
     renderRows();
+    renderSnippetRows(sqlRows, sqlCount, currentSqlRows);
+    renderSnippetRows(csharpRows, csharpCount, currentCsharpRows);
     updateCounts();
     setStatus(`Converted ${parsed.source}`, "valid");
   } catch (error) {
     currentRows = [];
+    currentSqlRows = [];
+    currentCsharpRows = [];
     renderRows();
+    renderSnippetRows(sqlRows, sqlCount, currentSqlRows);
+    renderSnippetRows(csharpRows, csharpCount, currentCsharpRows);
     updateCounts();
     setStatus(error.message, "error");
   }
@@ -208,6 +222,35 @@ function renderRows() {
   resultCount.textContent = `${currentRows.length} ${currentRows.length === 1 ? "value" : "values"}`;
 }
 
+function renderSnippetRows(container, counter, rows) {
+  container.textContent = "";
+
+  if (!rows.length) {
+    const empty = document.createElement("div");
+    empty.className = "output-row snippet-row";
+    empty.append(makeSpan("output-label", "Status"), makeSpan("output-value", "No snippets yet."), document.createElement("span"));
+    container.append(empty);
+  } else {
+    const fragment = document.createDocumentFragment();
+
+    rows.forEach((row) => {
+      const element = document.createElement("div");
+      const copyButton = document.createElement("button");
+      element.className = "output-row snippet-row";
+      copyButton.className = "copy-row";
+      copyButton.type = "button";
+      copyButton.textContent = "Copy";
+      copyButton.addEventListener("click", () => copyText(row.value, `Copied ${row.label}`));
+      element.append(makeSpan("output-label", row.label), makeSpan("output-value", row.value), copyButton);
+      fragment.append(element);
+    });
+
+    container.append(fragment);
+  }
+
+  counter.textContent = `${rows.length} ${rows.length === 1 ? "snippet" : "snippets"}`;
+}
+
 function makeSpan(className, text) {
   const span = document.createElement("span");
   span.className = className;
@@ -269,6 +312,41 @@ function formatRelative(date) {
   return `${minutes}m ${direction}`;
 }
 
+function buildSqlRows(date) {
+  const utc = formatSqlDateTime2Utc(date);
+  const local = formatLocalIso(date);
+  const dateOnly = `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
+  const timeOnly = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}${includeMilliseconds.checked ? `.${String(date.getMilliseconds()).padStart(3, "0")}` : ""}`;
+
+  return [
+    makeRow("datetime2 UTC", `CONVERT(datetime2(3), '${utc}', 126)`),
+    makeRow("datetimeoffset", `CONVERT(datetimeoffset(3), '${local}', 126)`),
+    makeRow("WHERE >= UTC", `WHERE [CreatedUtc] >= CONVERT(datetime2(3), '${utc}', 126)`),
+    makeRow("BETWEEN day", `WHERE [CreatedUtc] >= CONVERT(date, '${dateOnly}') AND [CreatedUtc] < DATEADD(day, 1, CONVERT(date, '${dateOnly}'))`),
+    makeRow("date literal", `CONVERT(date, '${dateOnly}')`),
+    makeRow("time literal", `CONVERT(time(3), '${timeOnly}')`)
+  ];
+}
+
+function buildCsharpRows(date) {
+  const utcIso = formatIso(date);
+  const unixMilliseconds = date.getTime();
+
+  return [
+    makeRow("DateTimeOffset", `DateTimeOffset.Parse("${utcIso}", CultureInfo.InvariantCulture)`),
+    makeRow("Unix ms", `DateTimeOffset.FromUnixTimeMilliseconds(${unixMilliseconds})`),
+    makeRow("UTC DateTime", `DateTime.Parse("${utcIso}", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal)`),
+    makeRow("LINQ >= DTO", `.Where(x => x.CreatedUtc >= DateTimeOffset.Parse("${utcIso}", CultureInfo.InvariantCulture))`),
+    makeRow("LINQ date range", `.Where(x => x.CreatedUtc >= DateTimeOffset.Parse("${utcIso}", CultureInfo.InvariantCulture) && x.CreatedUtc < DateTimeOffset.Parse("${formatIso(new Date(date.getTime() + 86400000))}", CultureInfo.InvariantCulture))`),
+    makeRow("Ticks", `new DateTime(${unixMillisecondsToTicks(date.getTime())}L, DateTimeKind.Utc)`)
+  ];
+}
+
+function formatSqlDateTime2Utc(date) {
+  const milliseconds = includeMilliseconds.checked ? `.${String(date.getUTCMilliseconds()).padStart(3, "0")}` : "";
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}T${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}${milliseconds}`;
+}
+
 function unixMillisecondsToTicks(milliseconds) {
   return dotnetEpochTicks + BigInt(milliseconds) * ticksPerMillisecond;
 }
@@ -321,7 +399,9 @@ function buildReport() {
       includeMilliseconds: includeMilliseconds.checked,
       useTwentyFourHour: useTwentyFourHour.checked
     },
-    rows: currentRows
+    rows: currentRows,
+    sqlSnippets: currentSqlRows,
+    csharpSnippets: currentCsharpRows
   };
 }
 
@@ -364,7 +444,11 @@ function copyTextFallback(text) {
 function clearAll() {
   sourceInput.value = "";
   currentRows = [];
+  currentSqlRows = [];
+  currentCsharpRows = [];
   renderRows();
+  renderSnippetRows(sqlRows, sqlCount, currentSqlRows);
+  renderSnippetRows(csharpRows, csharpCount, currentCsharpRows);
   updateCounts();
   setStatus("Ready", "idle");
 }

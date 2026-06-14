@@ -10,6 +10,8 @@ For logo, color, versioning, and publishing details, see [BRAND_AND_DEPLOYMENT.m
 
 - Convert ISO/date strings, Unix seconds, Unix milliseconds, and .NET ticks.
 - Show UTC ISO, local ISO, Unix timestamps, .NET ticks, RFC 1123, date-only, time-only, and relative time.
+- Generate copy-ready SQL Server snippets for `datetime2`, `datetimeoffset`, date ranges, and time literals.
+- Generate C# and LINQ snippets for `DateTimeOffset`, Unix milliseconds, ticks, and common query filters.
 - Fill current UTC or local time with one click.
 - Add or subtract days, hours, and minutes.
 - Copy individual values or save the full conversion report as JSON.
