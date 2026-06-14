@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/update-release.ps1
+git add -- index.html script.js

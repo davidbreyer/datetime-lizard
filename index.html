@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DateTime Lizard</title>
+    <link rel="icon" type="image/png" href="assets/apple-icon.png?v=20260613-2116">
+    <link rel="apple-touch-icon" href="assets/apple-icon.png?v=20260613-2116">
+    <link rel="stylesheet" href="styles.css?v=20260613-2116">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-bar">
+        <div class="brand-lockup">
+          <img src="assets/yelling-lizard-logo.png?v=20260613-2116" alt="" class="brand-logo" width="72" height="72">
+          <div>
+            <p class="eyebrow">.NET time converter</p>
+            <h1>DateTime Lizard</h1>
+          </div>
+        </div>
+        <div class="action-bar" aria-label="DateTime actions">
+          <details class="tools-menu">
+            <summary>Tools</summary>
+            <div class="tools-menu-list">
+              <a href="https://davidbreyer.github.io/format-lizard/">Format Lizard</a>
+              <a href="https://davidbreyer.github.io/compare-lizard/">Compare Lizard</a>
+              <a href="https://davidbreyer.github.io/mock-lizard/">Mock Lizard</a>
+              <a href="https://davidbreyer.github.io/duplicate-lizard/">Duplicate Lizard</a>
+              <a href="https://davidbreyer.github.io/datetime-lizard/" aria-current="page">DateTime Lizard</a>
+            </div>
+          </details>
+          <button id="nowUtcButton" type="button">Now UTC</button>
+          <button id="nowLocalButton" type="button">Now Local</button>
+          <button id="convertButton" type="button" class="primary-button">Convert</button>
+          <button id="copyButton" type="button">Copy</button>
+          <button id="saveButton" type="button">Save</button>
+          <button id="clearButton" type="button" class="ghost-button">Clear</button>
+        </div>
+      </header>
+
+      <section class="control-panel" aria-label="Conversion controls">
+        <div class="control-group">
+          <span class="control-group-title">Input</span>
+          <div class="control-row">
+            <label class="field-label" for="sourceFormat">Source</label>
+            <select id="sourceFormat">
+              <option value="auto">Auto detect</option>
+              <option value="iso">ISO / Date string</option>
+              <option value="unix-seconds">Unix seconds</option>
+              <option value="unix-milliseconds">Unix milliseconds</option>
+              <option value="dotnet-ticks">.NET ticks</option>
+            </select>
+
+            <label class="field-label" for="displayZone">Display</label>
+            <select id="displayZone">
+              <option value="local">Local + UTC</option>
+              <option value="utc">UTC first</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <span class="control-group-title">Options</span>
+          <div class="control-row">
+            <label class="checkbox-control" for="includeMilliseconds">
+              <input id="includeMilliseconds" type="checkbox" checked>
+              <span>Milliseconds</span>
+            </label>
+            <label class="checkbox-control" for="useTwentyFourHour">
+              <input id="useTwentyFourHour" type="checkbox" checked>
+              <span>24-hour local</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="status-row" aria-live="polite">
+        <div id="status" class="status-pill status-idle">Ready</div>
+        <div id="stats" class="stats">Local timezone detected by your browser</div>
+      </section>
+
+      <section class="workspace-grid">
+        <section class="input-panel" aria-label="DateTime input">
+          <div class="pane-header">
+            <label for="sourceInput">Input</label>
+            <span id="inputMeta">0 chars</span>
+          </div>
+          <div class="input-body">
+            <textarea id="sourceInput" spellcheck="false" aria-label="DateTime input"></textarea>
+            <div class="quick-grid" aria-label="Quick values">
+              <button type="button" data-sample="unix-seconds">Unix seconds</button>
+              <button type="button" data-sample="unix-milliseconds">Unix milliseconds</button>
+              <button type="button" data-sample="dotnet-ticks">.NET ticks</button>
+              <button type="button" data-sample="iso">ISO sample</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="output-panel" aria-label="Converted output">
+          <div class="pane-header">
+            <label for="outputRows">Converted Values</label>
+            <span id="resultCount">0 values</span>
+          </div>
+          <div id="outputRows" class="output-rows"></div>
+        </section>
+      </section>
+
+      <section class="math-panel" aria-label="Date math">
+        <div class="control-group">
+          <span class="control-group-title">Date Math</span>
+          <div class="control-row">
+            <label class="field-label" for="mathDirection">Action</label>
+            <select id="mathDirection">
+              <option value="add">Add</option>
+              <option value="subtract">Subtract</option>
+            </select>
+
+            <label class="field-label" for="daysInput">Days</label>
+            <input id="daysInput" type="number" min="0" step="1" value="0">
+
+            <label class="field-label" for="hoursInput">Hours</label>
+            <input id="hoursInput" type="number" min="0" step="1" value="0">
+
+            <label class="field-label" for="minutesInput">Minutes</label>
+            <input id="minutesInput" type="number" min="0" step="1" value="0">
+
+            <button id="applyMathButton" type="button">Apply</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="app-footer">
+        <span>Translate time before time translates you.</span>
+        <span>
+          <a href="https://github.com/davidbreyer/datetime-lizard" target="_blank" rel="noreferrer">GitHub</a>
+          <span id="releaseStamp" data-version>Version: 20260613-2116</span>
+        </span>
+      </footer>
+    </main>
+
+    <script src="script.js?v=20260613-2116"></script>
+  </body>
+</html>
