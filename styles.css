@@ -11,6 +11,9 @@
   --accent: #5f7a38;
   --accent-strong: #35471e;
   --accent-soft: #edf5e7;
+  --tool-accent: #365da8;
+  --tool-accent-strong: #29477f;
+  --tool-accent-soft: #eaf0fc;
   --time-soft: #edf4fa;
   --time: #496076;
   --warn: #b2452c;
@@ -72,6 +75,7 @@ textarea {
   gap: 16px;
   align-items: start;
   padding: 18px;
+  border-left: 5px solid var(--tool-accent);
   backdrop-filter: blur(18px);
 }
 
@@ -92,7 +96,7 @@ textarea {
 
 .eyebrow {
   margin: 0 0 3px;
-  color: var(--accent);
+  color: var(--tool-accent-strong);
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -103,6 +107,31 @@ h1 {
   font-size: clamp(1.65rem, 2.6vw, 2.45rem);
   line-height: 1.05;
   letter-spacing: 0;
+}
+
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-symbol {
+  min-width: 44px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border: 1px solid var(--tool-accent);
+  border-radius: 6px;
+  background: var(--tool-accent-soft);
+  color: var(--tool-accent-strong);
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.84rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .action-bar {
@@ -213,7 +242,7 @@ h1 {
 }
 
 .control-group-title {
-  color: var(--accent);
+  color: var(--tool-accent-strong);
   font-size: 0.76rem;
   font-weight: 900;
   text-transform: uppercase;
