@@ -25,7 +25,7 @@ const hoursInput = document.querySelector("#hoursInput");
 const minutesInput = document.querySelector("#minutesInput");
 const applyMathButton = document.querySelector("#applyMathButton");
 
-const appRelease = "20260709-2041";
+const appRelease = "20261118-0943";
 const dotnetEpochTicks = 621355968000000000n;
 const ticksPerMillisecond = 10000n;
 let currentRows = [];
